@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Analytics Dashboard - Brazilian E-Commerce</title>
+    <link rel="stylesheet" href="/static/css/premium_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <div class="container-nav">
+            <div class="nav-brand">
+                <span class="logo-icon">📊</span>
+                <h1>Premium Analytics</h1>
+                <span class="badge-beta">ML-Powered</span>
+            </div>
+            <div class="nav-controls">
+                <select id="dateFilter" class="select-modern">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="365">Last Year</option>
+                    <option value="all">All Time</option>
+                </select>
+                <button class="btn-icon" id="darkToggle" title="Toggle theme">
+                    <span class="icon">🌓</span>
+                </button>
+                <button class="btn-primary" id="refreshBtn">
+                    <span class="icon">↻</span> Refresh
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="loading" class="loading-overlay">
+                <div class="spinner-modern"></div>
+                <p>Loading insights...</p>
+            </div>
+
+            <!-- Hero KPIs -->
+            <section class="hero-section">
+                <div class="kpi-grid-hero">
+                    <div class="kpi-card-hero revenue-card">
+                        <div class="kpi-header">
+                            <span class="kpi-icon">💰</span>
+                            <span class="kpi-label">Total Revenue</span>
+                        </div>
+                        <div class="kpi-value" id="totalRevenue">R$ 0.00</div>
+                        <div class="kpi-trend positive">
+                            <span class="trend-icon">↗</span>
+                            <span class="trend-text">Based on selected period</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card-hero orders-card">
+                        <div class="kpi-header">
+                            <span class="kpi-icon">📦</span>
+                            <span class="kpi-label">Total Orders</span>
+                        </div>
+                        <div class="kpi-value" id="totalOrders">0</div>
+                        <div class="kpi-trend positive">
+                            <span class="trend-icon">↗</span>
+                            <span class="trend-text">Processing efficiently</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card-hero customers-card">
+                        <div class="kpi-header">
+                            <span class="kpi-icon">👥</span>
+                            <span class="kpi-label">Active Customers</span>
+                        </div>
+                        <div class="kpi-value" id="totalCustomers">0</div>
+                        <div class="kpi-trend">
+                            <span class="trend-icon">→</span>
+                            <span class="trend-text">Unique buyers</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card-hero avg-card">
+                        <div class="kpi-header">
+                            <span class="kpi-icon">📊</span>
+                            <span class="kpi-label">Avg Order Value</span>
+                        </div>
+                        <div class="kpi-value" id="avgOrderValue">R$ 0.00</div>
+                        <div class="kpi-trend">
+                            <span class="trend-icon">→</span>
+                            <span class="trend-text">Per transaction</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ML Model Performance -->
+            <section class="section-ml">
+                <h2 class="section-title">
+                    <span class="title-icon">🤖</span>
+                    ML Model Performance
+                </h2>
+                <div class="ml-grid">
+                    <div class="stat-card glass">
+                        <div class="stat-label">R² Score</div>
+                        <div class="stat-value" id="mlR2">0.00</div>
+                        <div class="stat-bar">
+                            <div class="stat-progress" id="mlR2Bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass">
+                        <div class="stat-label">MAE (R$)</div>
+                        <div class="stat-value" id="mlMAE">0.00</div>
+                        <div class="stat-subtitle">Mean Absolute Error</div>
+                    </div>
+
+                    <div class="stat-card glass">
+                        <div class="stat-label">ROC AUC</div>
+                        <div class="stat-value" id="mlROC">0.000</div>
+                        <div class="stat-bar">
+                            <div class="stat-progress" id="mlROCBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass">
+                        <div class="stat-label">Training Samples</div>
+                        <div class="stat-value" id="mlSamples">0</div>
+                        <div class="stat-subtitle">Model trained on</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Revenue Forecast -->
+            <section class="section-chart">
+                <div class="chart-card-modern glass">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">📈 Revenue Forecast</h3>
+                            <p class="chart-subtitle">90-day history + 30-day prediction</p>
+                        </div>
+                        <span class="badge-status">Live</span>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customer Lifetime Value & Delivery Performance -->
+            <div class="grid-2-col">
+                <div class="chart-card-modern glass">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">💎 Customer Lifetime Value</h3>
+                            <p class="chart-subtitle">CLV distribution by segment</p>
+                        </div>
+                    </div>
+                    <div class="chart-container-medium">
+                        <canvas id="clvChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card-modern glass">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">🚚 Delivery Performance</h3>
+                            <p class="chart-subtitle">Average delivery time by state</p>
+                        </div>
+                    </div>
+                    <div class="chart-container-medium">
+                        <canvas id="deliveryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Recommendations -->
+            <section class="section-recommendations">
+                <h2 class="section-title">
+                    <span class="title-icon">🎯</span>
+                    Product Recommendations
+                    <span class="badge-info">Frequently Bought Together</span>
+                </h2>
+                <div class="recommendations-grid" id="recommendationsGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Advanced Analytics Grid -->
+            <div class="grid-3-col">
+                <div class="insight-card glass">
+                    <div class="insight-icon">🔮</div>
+                    <div class="insight-title">Predictive Analytics</div>
+                    <div class="insight-value" id="predictionAccuracy">98.6%</div>
+                    <div class="insight-label">Model Accuracy</div>
+                </div>
+
+                <div class="insight-card glass">
+                    <div class="insight-icon">⚡</div>
+                    <div class="insight-title">Processing Speed</div>
+                    <div class="insight-value" id="processingSpeed">< 200ms</div>
+                    <div class="insight-label">Avg Response Time</div>
+                </div>
+
+                <div class="insight-card glass">
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-title">Prediction Confidence</div>
+                    <div class="insight-value" id="confidenceScore">High</div>
+                    <div class="insight-label">Current Status</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer glass">
+        <div class="container-footer">
+            <div class="footer-left">
+                <p>© 2025 Premium Analytics Dashboard</p>
+                <p class="footer-subtitle">Powered by Machine Learning & Advanced Analytics</p>
+            </div>
+            <div class="footer-right">
+                <p>Last updated: <span id="lastUpdate"></span></p>
+                <p class="footer-subtitle">Data from Brazilian E-Commerce Dataset</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/premium_dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+[2024-11-13 15:45:23,123] INFO - Starting ETL pipeline run_id: etl_20241113_154523
+[2024-11-13 15:45:23,234] INFO - ====== INGEST TASK STARTED ======
+[2024-11-13 15:45:23,345] INFO - Source type: csv
+[2024-11-13 15:45:23,456] INFO - Source path: data/staging/olist_orders_dataset.csv
+[2024-11-13 15:45:24,123] ERROR - Failed to read CSV file
+[2024-11-13 15:45:24,234] ERROR - FileNotFoundError: data/staging/olist_orders_dataset.csv not found
+[2024-11-13 15:45:24,345] ERROR - Traceback (most recent call last):
+[2024-11-13 15:45:24,456] ERROR -   File "c:\Users\samar\Desktop\prjct_thash\ETL\etl\ingest.py", line 45, in fetch_from_source
+[2024-11-13 15:45:24,567] ERROR -     df = pd.read_csv(source_path)
+[2024-11-13 15:45:24,678] ERROR -   File "site-packages\pandas\io\parsers\readers.py", line 948, in read_csv
+[2024-11-13 15:45:24,789] ERROR -     return _read(filepath_or_buffer, kwds)
+[2024-11-13 15:45:24,890] ERROR -   File "site-packages\pandas\io\parsers\readers.py", line 611, in _read
+[2024-11-13 15:45:24,991] ERROR -     parser = TextFileReader(filepath_or_buffer, **kwds)
+[2024-11-13 15:45:25,092] ERROR - FileNotFoundError: [Errno 2] No such file or directory: 'data/staging/olist_orders_dataset.csv'
+[2024-11-13 15:45:25,193] ERROR - ====== INGEST TASK FAILED ======
+[2024-11-13 15:45:25,294] ERROR - Duration: 2.0 seconds
+[2024-11-13 15:45:25,395] ERROR - Error: File not found
+
+[2024-11-13 15:45:25,567] INFO - ====== NOTIFY TASK STARTED ======
+[2024-11-13 15:45:25,678] WARNING - Pipeline status: FAILED
+[2024-11-13 15:45:25,789] WARNING - Failed task: ingest_task
+[2024-11-13 15:45:25,890] INFO - Sending failure alert to: data-team@company.com
+[2024-11-13 15:45:26,234] INFO - Email alert sent successfully
+[2024-11-13 15:45:26,345] INFO - Logging failure to audit table
+[2024-11-13 15:45:26,456] INFO - Audit record created:
+[2024-11-13 15:45:26,567] INFO -   run_id: etl_20241113_154523
+[2024-11-13 15:45:26,678] INFO -   status: failed
+[2024-11-13 15:45:26,789] INFO -   error_message: FileNotFoundError: File not found
+[2024-11-13 15:45:26,890] INFO -   rows_ingested: 0
+[2024-11-13 15:45:26,991] INFO -   duration_seconds: 3.8
+[2024-11-13 15:45:27,092] INFO - ====== NOTIFY TASK COMPLETED ======
+
+[2024-11-13 15:45:27,234] ERROR - ====== ETL PIPELINE FAILED ======
+[2024-11-13 15:45:27,345] ERROR - Run ID: etl_20241113_154523
+[2024-11-13 15:45:27,456] ERROR - Status: FAILED
+[2024-11-13 15:45:27,567] ERROR - Failed Task: ingest_task
+[2024-11-13 15:45:27,678] ERROR - Error: FileNotFoundError: File not found
+[2024-11-13 15:45:27,789] ERROR - Total Duration: 4.5 seconds
+[2024-11-13 15:45:27,890] ERROR - ====================================

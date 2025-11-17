@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: etl-dashboard
+    env: python
+    plan: starter
+    repo: ''
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app -b 0.0.0.0:$PORT --workers 2
+    envVars:
+      - key: DATABASE_URL
+        # Placeholder: set this secret in Render (do NOT commit real secrets)
+        value: "REPLACE_WITH_DATABASE_URL"
+
+# Cron job to run ETL daily (run the repo's run_etl.py script)
+cron:
+  - name: etl-cron
+    type: cron
+    schedule: "0 3 * * *" # daily at 03:00 UTC
+    command: python scripts/run_etl.py
+    envVars:
+      - key: DATABASE_URL
+        value: "REPLACE_WITH_DATABASE_URL"
+
+databases:
+  - name: etl-db
+    plan: starter

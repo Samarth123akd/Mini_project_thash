@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce ETL Analytics Dashboard</title>
+    <link rel="stylesheet" href="/static/css/ecommerce_dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#gradient1)"/>
+                        <path d="M8 12L16 8L24 12V20L16 24L8 20V12Z" stroke="white" stroke-width="2" fill="none"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <h1>ETL Analytics</h1>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="overview">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <rect x="3" y="3" width="6" height="6" rx="1"/>
+                        <rect x="11" y="3" width="6" height="6" rx="1"/>
+                        <rect x="3" y="11" width="6" height="6" rx="1"/>
+                        <rect x="11" y="11" width="6" height="6" rx="1"/>
+                    </svg>
+                    <span>Overview</span>
+                </button>
+                
+                <button class="nav-item" data-view="orders">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 3h14l-1 10H4L3 3z"/>
+                        <circle cx="7" cy="16" r="1.5"/>
+                        <circle cx="14" cy="16" r="1.5"/>
+                    </svg>
+                    <span>Orders</span>
+                </button>
+                
+                <button class="nav-item" data-view="customers">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="10" cy="7" r="3"/>
+                        <path d="M3 17c0-3.87 3.13-7 7-7s7 3.13 7 7"/>
+                    </svg>
+                    <span>Customers</span>
+                </button>
+                
+                <button class="nav-item" data-view="products">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <rect x="3" y="3" width="14" height="14" rx="2"/>
+                        <path d="M7 10h6M10 7v6" stroke="white" stroke-width="2"/>
+                    </svg>
+                    <span>Products</span>
+                </button>
+                
+                <button class="nav-item" data-view="sellers">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 8l7-5 7 5v9H3V8z"/>
+                        <rect x="8" y="11" width="4" height="6"/>
+                    </svg>
+                    <span>Sellers</span>
+                </button>
+                
+                <button class="nav-item" data-view="payments">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <rect x="2" y="5" width="16" height="10" rx="2"/>
+                        <rect x="2" y="7" width="16" height="3" fill="rgba(255,255,255,0.3)"/>
+                    </svg>
+                    <span>Payments</span>
+                </button>
+                
+                <button class="nav-item" data-view="geography">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M10 2v16M2 10h16"/>
+                    </svg>
+                    <span>Geography</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="date-filter">
+                    <label>Time Range</label>
+                    <select id="dateFilter">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                        <option value="365">Last Year</option>
+                        <option value="all" selected>All Time</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <header class="content-header">
+                <div class="header-left">
+                    <h2 id="viewTitle">Dashboard Overview</h2>
+                    <p id="viewSubtitle">Complete analytics for your e-commerce ETL pipeline</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn-secondary" onclick="refreshData()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13 8c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5V1l4 4-4 4V6c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3h2z"/>
+                        </svg>
+                        Refresh
+                    </button>
+                    <button class="btn-primary" onclick="exportData()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 12l-4-4h3V2h2v6h3l-4 4zM2 14h12v2H2z"/>
+                        </svg>
+                        Export
+                    </button>
+                </div>
+            </header>
+            
+            <!-- VIEW CONTAINERS -->
+            <div class="view-content">
+                <!-- OVERVIEW VIEW -->
+                <div id="overviewView" class="view active">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <path d="M3 3h18l-2 14H5L3 3z"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-content">
+                                <div class="kpi-label">Total Orders</div>
+                                <div class="kpi-value" id="kpiTotalOrders">0</div>
+                                <div class="kpi-change positive">+12.5% vs last period</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <text x="5" y="18" font-size="16" font-weight="bold">R$</text>
+                                </svg>
+                            </div>
+                            <div class="kpi-content">
+                                <div class="kpi-label">Total Revenue</div>
+                                <div class="kpi-value" id="kpiTotalRevenue">R$ 0</div>
+                                <div class="kpi-change positive">+8.3% vs last period</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <circle cx="12" cy="8" r="4"/>
+                                    <path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-content">
+                                <div class="kpi-label">Total Customers</div>
+                                <div class="kpi-value" id="kpiTotalCustomers">0</div>
+                                <div class="kpi-change positive">+15.2% vs last period</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-content">
+                                <div class="kpi-label">Avg Order Value</div>
+                                <div class="kpi-value" id="kpiAvgOrderValue">R$ 0</div>
+                                <div class="kpi-change negative">-3.1% vs last period</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-grid-2">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Order Timeline</h3>
+                                <p>Daily order trends and revenue</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="orderTimelineChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Order Status Distribution</h3>
+                                <p>Current order status breakdown</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="orderStatusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-grid-3">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Top Product Categories</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="topCategoriesChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Payment Methods</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="paymentMethodsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Customer Segments</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="customerSegmentsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ORDERS VIEW -->
+                <div id="ordersView" class="view">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Delivered</div>
+                            <div class="stat-value" id="statsDelivered">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Shipped</div>
+                            <div class="stat-value" id="statsShipped">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Processing</div>
+                            <div class="stat-value" id="statsProcessing">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Delivery Time</div>
+                            <div class="stat-value" id="statsAvgDelivery">0 days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card large">
+                        <div class="chart-header">
+                            <h3>Order Status Over Time</h3>
+                            <p>Track order progression through different stages</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="orderStatusTimelineChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-grid-2">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Delivery Performance</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="deliveryPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Order Value Distribution</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="orderValueDistChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CUSTOMERS VIEW -->
+                <div id="customersView" class="view">
+                    <div class="chart-grid-2">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Customer Geography - Top States</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="customerGeographyChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Customer Lifetime Value Segments</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="clvSegmentsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card large">
+                        <div class="chart-header">
+                            <h3>Top 20 Cities by Customer Count</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="topCitiesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PRODUCTS VIEW -->
+                <div id="productsView" class="view">
+                    <div class="chart-grid-2">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Top 20 Selling Products</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="topProductsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Category Performance</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Price Range Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="priceDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SELLERS VIEW -->
+                <div id="sellersView" class="view">
+                    <div class="chart-grid-2">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Top 20 Sellers by Revenue</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="topSellersChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Seller Geography</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sellerGeographyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PAYMENTS VIEW -->
+                <div id="paymentsView" class="view">
+                    <div class="chart-grid-2">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Payment Methods Distribution</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="paymentMethodDistChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Installment Plans</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="installmentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- GEOGRAPHY VIEW -->
+                <div id="geographyView" class="view">
+                    <div class="chart-card large">
+                        <div class="chart-header">
+                            <h3>Customer Distribution by State</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="geoCustomerChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card large">
+                        <div class="chart-header">
+                            <h3>Revenue by State</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="geoRevenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading data...</p>
+    </div>
+    
+    <script src="/static/js/ecommerce_dashboard.js"></script>
+</body>
+</html>

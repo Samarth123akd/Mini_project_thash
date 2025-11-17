@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Analytics Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>📊 E-Commerce Analytics Dashboard</h1>
+            <div class="controls">
+                <select id="dateFilter" title="Select date range">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="365">Last Year</option>
+                    <option value="all">All Time</option>
+                </select>
+                <label class="toggle">
+                    <input type="checkbox" id="mixToggle" />
+                    <span>Mix recent orders</span>
+                </label>
+                <button class="btn btn-secondary" id="darkToggle" title="Toggle dark mode">🌓</button>
+                <button class="btn btn-primary" id="refreshBtn">
+                    <span>🔄</span> Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card revenue">
+                    <div class="icon">💰</div>
+                    <div class="label">Total Revenue</div>
+                    <div class="value" id="totalRevenue">R$ 0.00</div>
+                    <div class="change positive" id="revenueChange">
+                        <span>↑</span> 0%
+                    </div>
+                </div>
+
+                <div class="kpi-card orders">
+                    <div class="icon">📦</div>
+                    <div class="label">Total Orders</div>
+                    <div class="value" id="totalOrders">0</div>
+                    <div class="change positive" id="ordersChange">
+                        <span>↑</span> 0%
+                    </div>
+                </div>
+
+                <div class="kpi-card customers">
+                    <div class="icon">👥</div>
+                    <div class="label">Unique Customers</div>
+                    <div class="value" id="totalCustomers">0</div>
+                    <div class="change" id="customersChange">
+                    </div>
+                </div>
+
+                <div class="kpi-card avg-value">
+                    <div class="icon">📊</div>
+                    <div class="label">Avg Order Value</div>
+                    <div class="value" id="avgOrderValue">R$ 0.00</div>
+                    <div class="change" id="avgChange">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Trends Chart -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Sales Trends</h2>
+                        <p class="card-subtitle">Revenue and order volume over time</p>
+                    </div>
+                </div>
+                <div class="chart-container tall">
+                    <canvas id="salesTrendsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Two Column Charts -->
+            <div class="two-columns">
+                <!-- Top Products -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Top Products</h2>
+                            <p class="card-subtitle">Best selling products by revenue</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Customer Segments -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Customer Segments</h2>
+                            <p class="card-subtitle">Distribution by total spend</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="customerSegmentsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Charts - Row 2 -->
+            <div class="two-columns">
+                <!-- Order Status -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Orders by Status</h2>
+                            <p class="card-subtitle">Current order status distribution</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Revenue by State -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Revenue by State</h2>
+                            <p class="card-subtitle">Top performing states</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueByStateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Table -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Recent Orders</h2>
+                        <p class="card-subtitle">Latest transactions</p>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer ID</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 E-Commerce Analytics Dashboard. Built with HTML, CSS, and JavaScript.</p>
+            <p>Last updated: <span id="lastUpdate"></span></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script>
+        // Update last update time
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
+    </script>
+</body>
+</html>

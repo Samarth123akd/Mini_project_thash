@@ -1,0 +1,11 @@
+## Example DB config. Replace with real credentials or set an environment-based URI.
+# user: yourusername
+# password: yourpassword
+# host: localhost
+# port: 5432
+# database: ecommerce
+# Optionally supply a full SQLAlchemy URI instead of individual fields:
+# uri: postgresql://user:pass@host:5432/dbname
+
+# Example placeholder for local demo:
+uri: ''

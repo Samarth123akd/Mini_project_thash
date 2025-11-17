@@ -1,0 +1,98 @@
+[2024-11-13 14:30:15,234] INFO - Starting ETL pipeline run_id: etl_20241113_143015
+[2024-11-13 14:30:15,456] INFO - ====== INGEST TASK STARTED ======
+[2024-11-13 14:30:15,457] INFO - Source type: csv
+[2024-11-13 14:30:15,458] INFO - Source path: data/staging/olist_orders_dataset.csv
+[2024-11-13 14:30:16,123] INFO - Reading CSV file with 99,441 rows
+[2024-11-13 14:30:17,234] INFO - Saving raw data to: data/staging/raw/csv/olist_orders/2024-11-13/olist_orders_20241113_143015.json.gz
+[2024-11-13 14:30:18,456] INFO - Raw file compressed: 8.2 MB → 1.4 MB (82% reduction)
+[2024-11-13 14:30:18,457] INFO - ====== INGEST TASK COMPLETED ======
+[2024-11-13 14:30:18,458] INFO - Duration: 3.2 seconds
+[2024-11-13 14:30:18,459] INFO - Output: data/staging/raw/csv/olist_orders/2024-11-13/olist_orders_20241113_143015.json.gz
+
+[2024-11-13 14:30:19,123] INFO - ====== TRANSFORM TASK STARTED ======
+[2024-11-13 14:30:19,124] INFO - Input file: data/staging/raw/csv/olist_orders/2024-11-13/olist_orders_20241113_143015.json.gz
+[2024-11-13 14:30:19,567] INFO - Loaded 99,441 raw records
+[2024-11-13 14:30:20,234] INFO - Removing duplicates... Found 23 duplicates (0.02%)
+[2024-11-13 14:30:20,456] INFO - Cleaning missing values... 15,234 nulls imputed
+[2024-11-13 14:30:21,123] INFO - Normalizing timestamps to UTC... 99,418 timestamps converted
+[2024-11-13 14:30:21,789] INFO - Normalizing currency to cents... 99,418 values converted
+[2024-11-13 14:30:22,345] INFO - Computing order metrics... order_total, item_count added
+[2024-11-13 14:30:23,567] INFO - Running data quality checks...
+[2024-11-13 14:30:24,123] INFO -   Completeness: 94.5%
+[2024-11-13 14:30:24,234] INFO -   Validity: 88.2%
+[2024-11-13 14:30:24,345] INFO -   Consistency: 96.1%
+[2024-11-13 14:30:24,456] INFO -   Timeliness: 82.3%
+[2024-11-13 14:30:24,567] INFO -   Uniqueness: 99.98%
+[2024-11-13 14:30:24,678] INFO -   Accuracy: 91.4%
+[2024-11-13 14:30:24,789] INFO -   Conformity: 87.6%
+[2024-11-13 14:30:24,890] INFO -   Integrity: 100.0%
+[2024-11-13 14:30:24,991] INFO - Overall Quality Score: 92.5%
+[2024-11-13 14:30:25,123] INFO - Saving cleaned data to: data/staging/clean/orders_clean_20241113_143015.csv
+[2024-11-13 14:30:26,456] INFO - ====== TRANSFORM TASK COMPLETED ======
+[2024-11-13 14:30:26,457] INFO - Duration: 7.3 seconds
+[2024-11-13 14:30:26,458] INFO - Output: data/staging/clean/orders_clean_20241113_143015.csv
+[2024-11-13 14:30:26,459] INFO - Cleaned records: 99,418
+
+[2024-11-13 14:30:27,123] INFO - ====== LOAD TASK STARTED ======
+[2024-11-13 14:30:27,124] INFO - Connecting to PostgreSQL: postgresql://localhost:5432/etl_db
+[2024-11-13 14:30:27,456] INFO - Connection established successfully
+[2024-11-13 14:30:27,567] INFO - Loading dimension: dim_customers
+[2024-11-13 14:30:28,234] INFO -   Using upsert strategy (ON CONFLICT)
+[2024-11-13 14:30:29,456] INFO -   Loaded 96,096 customer records (34 updated)
+[2024-11-13 14:30:29,567] INFO - Loading dimension: dim_products
+[2024-11-13 14:30:30,123] INFO -   Using upsert strategy (ON CONFLICT)
+[2024-11-13 14:30:31,234] INFO -   Loaded 32,951 product records (12 updated)
+[2024-11-13 14:30:31,345] INFO - Loading fact table: fact_orders
+[2024-11-13 14:30:31,456] INFO -   Using COPY FROM STDIN for bulk loading
+[2024-11-13 14:30:31,567] INFO -   Progress: 10,000 rows loaded...
+[2024-11-13 14:30:32,123] INFO -   Progress: 20,000 rows loaded...
+[2024-11-13 14:30:32,678] INFO -   Progress: 30,000 rows loaded...
+[2024-11-13 14:30:33,234] INFO -   Progress: 40,000 rows loaded...
+[2024-11-13 14:30:33,789] INFO -   Progress: 50,000 rows loaded...
+[2024-11-13 14:30:34,345] INFO -   Progress: 60,000 rows loaded...
+[2024-11-13 14:30:34,890] INFO -   Progress: 70,000 rows loaded...
+[2024-11-13 14:30:35,456] INFO -   Progress: 80,000 rows loaded...
+[2024-11-13 14:30:36,012] INFO -   Progress: 90,000 rows loaded...
+[2024-11-13 14:30:36,567] INFO -   Loaded 99,418 order records in 5.1 seconds (19,493 rows/sec)
+[2024-11-13 14:30:36,678] INFO - Loading audit record to ingest_audit table
+[2024-11-13 14:30:36,789] INFO -   run_id: etl_20241113_143015
+[2024-11-13 14:30:36,890] INFO -   source_type: csv
+[2024-11-13 14:30:36,991] INFO -   table_name: fact_orders
+[2024-11-13 14:30:37,092] INFO -   rows_ingested: 99,418
+[2024-11-13 14:30:37,193] INFO -   rows_failed: 0
+[2024-11-13 14:30:37,294] INFO -   status: success
+[2024-11-13 14:30:37,395] INFO -   duration_seconds: 10.2
+[2024-11-13 14:30:37,496] INFO - Committing transaction...
+[2024-11-13 14:30:37,678] INFO - ====== LOAD TASK COMPLETED ======
+[2024-11-13 14:30:37,679] INFO - Duration: 10.5 seconds
+[2024-11-13 14:30:37,680] INFO - Total rows loaded: 99,418
+
+[2024-11-13 14:30:38,234] INFO - ====== VALIDATE TASK STARTED ======
+[2024-11-13 14:30:38,345] INFO - Input file: data/staging/clean/orders_clean_20241113_143015.csv
+[2024-11-13 14:30:38,456] INFO - Running validation checks...
+[2024-11-13 14:30:38,567] INFO - Check 1: File exists ✓
+[2024-11-13 14:30:38,678] INFO - Check 2: File readable ✓
+[2024-11-13 14:30:39,123] INFO - Check 3: Row count > 0 ✓ (99,418 rows)
+[2024-11-13 14:30:39,567] INFO - Check 4: Quality score >= 80% ✓ (92.5% >= 80%)
+[2024-11-13 14:30:39,678] INFO - Check 5: Null percentage <= 20% ✓ (5.5% <= 20%)
+[2024-11-13 14:30:39,789] INFO - Check 6: Duplicate percentage <= 5% ✓ (0.02% <= 5%)
+[2024-11-13 14:30:39,890] INFO - Check 7: Database row count verification...
+[2024-11-13 14:30:40,234] INFO -   File rows: 99,418
+[2024-11-13 14:30:40,567] INFO -   Database rows: 99,418
+[2024-11-13 14:30:40,678] INFO -   Match: ✓
+[2024-11-13 14:30:40,789] INFO - All validation checks passed ✓
+[2024-11-13 14:30:40,890] INFO - ====== VALIDATE TASK COMPLETED ======
+[2024-11-13 14:30:40,891] INFO - Duration: 2.6 seconds
+
+[2024-11-13 14:30:41,123] INFO - ====== NOTIFY TASK STARTED ======
+[2024-11-13 14:30:41,234] INFO - Pipeline status: SUCCESS
+[2024-11-13 14:30:41,345] INFO - No failures detected, skipping alert notification
+[2024-11-13 14:30:41,456] INFO - ====== NOTIFY TASK COMPLETED ======
+
+[2024-11-13 14:30:41,567] INFO - ====== ETL PIPELINE COMPLETED ======
+[2024-11-13 14:30:41,668] INFO - Run ID: etl_20241113_143015
+[2024-11-13 14:30:41,769] INFO - Status: SUCCESS
+[2024-11-13 14:30:41,870] INFO - Total Duration: 26.4 seconds
+[2024-11-13 14:30:41,971] INFO - Records Processed: 99,418
+[2024-11-13 14:30:42,072] INFO - Quality Score: 92.5%
+[2024-11-13 14:30:42,173] INFO - ====================================
